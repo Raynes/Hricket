@@ -1,33 +1,39 @@
 module ScoreCard where
 
--- TODO rewrite this code so that Card is actually a Map and an Int (for score.
+import qualified Data.Map as M
 
-data Mark = None | One | Two | Closed | Open
+type Score = Int
+
+data Mark = None | One | Two | Closed
+            deriving (Show,Eq)
+
+instance Num Mark where
+  (+) None x   = x
+  (+) x None   = x
+  (+) One One  = Two
+  (+) Closed _ = Closed
+  (+) _ Closed = Closed
+  (+) One Two  = Closed
+  (+) Two One  = Closed
+  (+) Two Two  = Closed
+  
+  fromInteger 0 = None
+  fromInteger 1 = One
+  fromInteger 2 = Two
+  fromInteger 3 = Closed
+
+data Card = Card (M.Map Int Mark) Score 
             deriving (Show)
 
-data Card = Card {fift  :: Mark
-                 ,sixt  :: Mark
-                 ,sevt  :: Mark
-                 ,eigt  :: Mark
-                 ,nint  :: Mark
-                 ,twet  :: Mark
-                 ,bull  :: Mark
-                 ,score :: Int}
-            deriving (Show)
+getMap :: Card -> M.Map Int Mark
+getMap (Card m _) = m
 
-setMark :: [Char] -> Card -> Mark
-setMark n = case n of
-              "15"   -> fift
-              "16"   -> sixt
-              "17"   -> sevt
-              "18"   -> eigt
-              "19"   -> nint
-              "20"   -> twet
-              "bull" -> bull
+getScore :: Card -> Score
+getScore (Card _ s) = s
 
-changeMark :: Card -> (String, Mark) -> Card
-changeMark c (s,m) = c {}
+setScore :: Card -> Score -> Card
+setScore (Card m _) s = Card m s
 
-
---mark :: Card -> [(String, Mark)] -> Card
---mark c (s,m) = c {sfunc = 
+{- Incomplete
+setMarks :: Card -> [(Int, Mark)] -> Card
+setMarks c alist = foldr -}
