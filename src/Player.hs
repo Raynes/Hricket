@@ -1,4 +1,4 @@
-module ScoreCard where
+module Player where
 
 import qualified Data.Map as M
 
@@ -34,6 +34,18 @@ getScore (Card _ s) = s
 setScore :: Card -> Score -> Card
 setScore (Card m _) s = Card m s
 
-{- Incomplete
-setMarks :: Card -> [(Int, Mark)] -> Card
-setMarks c alist = foldr -}
+data Player = Player String Card
+              deriving (Show)
+
+name :: Player -> String
+name (Player s _) = s
+
+card :: Player -> Card
+card (Player _ c) = c
+
+------------------------------------------------------
+-- Code to work with the types. ----------------------
+------------------------------------------------------
+
+setMarks :: Player -> Player -> [(Int, Mark)] -> Card
+setMarks p p2 darts = undefined -- TODO
