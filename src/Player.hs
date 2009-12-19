@@ -5,7 +5,13 @@ import qualified Data.Map as M
 type Score = Int
 
 data Mark = None | One | Two | Closed
-            deriving (Show,Eq)
+            deriving (Show,Eq,Ord)
+
+data ScoreRes = S Int 
+              | D Int 
+              | T Int
+              | N
+                deriving (Show,Eq,Read)
 
 instance Num Mark where
   (+) None x   = x
@@ -22,8 +28,11 @@ instance Num Mark where
   fromInteger 2 = Two
   fromInteger 3 = Closed
 
-data Card = Card (M.Map Int Mark) Score 
-            deriving (Show)
+data Card = Card (M.Map Int Mark) Score
+
+instance Show Card where
+  show (Card m s) = foldl step "" (M.toList m) ++ "Score: " ++ show s
+    where step xs (n,mark) = xs ++ (show n ++ ": ") ++ show mark ++ "\n"
 
 getMap :: Card -> M.Map Int Mark
 getMap (Card m _) = m
@@ -43,6 +52,11 @@ name (Player s _) = s
 card :: Player -> Card
 card (Player _ c) = c
 
+data ScoreCard = ScoreCard Player Player
+
+instance Show ScoreCard where
+  show (ScoreCard (Player _ c) (Player _ c2)) = undefined
+  
 ------------------------------------------------------
 -- Code to work with the types. ----------------------
 ------------------------------------------------------
