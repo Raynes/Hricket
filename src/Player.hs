@@ -2,7 +2,8 @@ module Player where
 
 import qualified Data.Map as M
 import Data.List (intercalate)
-import Control.Monad
+import Control.Monad (ap)
+import Data.Function (on)
 
 type Score = Int
 
@@ -76,13 +77,20 @@ instance Show ScoreCard where
 -- Code to work with the types. ----------------------
 ------------------------------------------------------
 
+
 setMarks :: Player -> Player -> [(Int, Mark)] -> Player
-setMarks p p2 darts = setCard p $ setMap pc1 $ foldr step pc1 darts
+setMarks p p2 darts = setCard p $ setMap pc1 $ getMap $ foldr step pc1 darts
     where (pc1,pc2) = (card p, getMap (card p2))
           step (n,m) ys = let (Just p2cur) = M.lookup n pc2
                               (Just p1cur) = M.lookup n $ getMap ys
-                          in if ((&&) `on` (== Closed)) p2cur p1cur
+                          in if ((&&) `on` (== Closed)) p2cur p1cur || n < 15
                              then ys
-                             else if p1curr < Closed
-                                  then setMap ys $ M.update (const (Just (p1curr + m))) n getMap ys
-                                  else setScore ys $ getScore ys + 3
+                             else if p1cur < Closed
+                                  then setMap ys $ M.update (const (Just (p1cur + m))) n (getMap ys)
+                                  else setScore ys $ m `multNum` getScore ys
+
+multNum :: Mark -> (Int -> Int)
+multNum None   = id
+multNum One    = id
+multNum Two    = (*2)
+multNum Closed = (*3)
