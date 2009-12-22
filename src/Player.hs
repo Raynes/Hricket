@@ -1,6 +1,7 @@
 module Player where
 
 import qualified Data.Map as M
+import Data.List (intercalate)
 
 type Score = Int
 
@@ -34,6 +35,7 @@ instance Show Card where
   show (Card m s) = foldl step "" (M.toList m) ++ "Score: " ++ show s
     where step xs (n,mark) = xs ++ (show n ++ ": ") ++ show mark ++ "\n"
 
+
 getMap :: Card -> M.Map Int Mark
 getMap (Card m _) = m
 
@@ -55,7 +57,11 @@ card (Player _ c) = c
 data ScoreCard = ScoreCard Player Player
 
 instance Show ScoreCard where
-  show (ScoreCard (Player _ c) (Player _ c2)) = undefined
+  show (ScoreCard (Player _ c) (Player _ c2)) =
+    intercalate "\n" $
+    zipWith (++) (map (\x -> x ++ replicate (12 - length x) ' ') $ lines $ show c)
+            (lines $ show c2)
+    
   
 ------------------------------------------------------
 -- Code to work with the types. ----------------------
