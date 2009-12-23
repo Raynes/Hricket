@@ -1,4 +1,4 @@
-module Player (Mark(..), Player, createPlayer, setMarks)  where
+module Player (Mark(..), Player, createPlayer, mark)  where
 
 import qualified Data.Map as M
 import Data.List (intercalate)
@@ -76,10 +76,10 @@ isGameOver p1 p2 = ((&&) `on` (== replicate 7 Three)) play1 play2
               (map snd (M.toList $ getCMap p1),map snd (M.toList $ getCMap p2))
 
 mark :: Player -> Player -> [String]-> Player
-mark p1 p2 darts = undefined
+mark p1 p2 darts = setMarks p1 p2 $ dartString darts
 
 dartString :: [String] -> [(Int, Mark)]
-dartString xs = helper $ words $ intercalate " " xs
+dartString = helper . words . intercalate " "
     where helper (x:y:xs) = (read x :: Int, read y :: Mark) : helper xs
           helper []       = []
 
