@@ -1,20 +1,17 @@
-module Player where
+module Player (Mark(..), Player, createPlayer, setMarks)  where
 
 import qualified Data.Map as M
 import Data.List (intercalate)
 import Control.Monad (ap)
 import Data.Function (on)
+import Data.Maybe
 
 type Score = Int
 
+-- A basic numeric type to represent
+-- the number of marks a number has on it.
 data Mark = None | One | Two | Closed
-            deriving (Show,Eq,Ord)
-
-data ScoreRes = S Int 
-              | D Int 
-              | T Int
-              | N
-                deriving (Show,Eq,Read)
+            deriving (Show,Eq,Ord,Read)
 
 instance Num Mark where
   (+) None x   = x
@@ -38,7 +35,7 @@ instance Show Card where
     where step xs (n,mark) = xs ++ (show n ++ ": ") ++ show mark ++ "\n"
 
 createCard :: Card
-createCard = Card (M.fromList (zip [15..21] (replicate 5 None))) 0
+createCard = Card (M.fromList (zip [15..21] (replicate 7 None))) 0
 
 getMap :: Card -> M.Map Int Mark
 getMap (Card m _) = m
@@ -68,31 +65,29 @@ card (Player _ c) = c
 
 setCard :: Player -> Card -> Player
 setCard (Player s _) = Player s
-
-data ScoreCard = ScoreCard Player Player
-
-instance Show ScoreCard where
-  show (ScoreCard c c2) =
-    intercalate "\n" $ zipWith (++) 
-    (map (\x -> x ++ replicate (20 - length x) ' ') $ lines $ show c)
-    (lines $ show c2)
-    
   
 ------------------------------------------------------
--- Code to work with the types. ----------------------
+-- The beef. -----------------------------------------
 ------------------------------------------------------
 
+isGameOver :: Player -> Player -> Bool
+isGameOver p1 p2 = ((&&) `on` (== replicate 7 Closed)) play1 play2
+    where (play1,play2) = 
+              (map snd (M.toList $ getCMap p1),map snd (M.toList $ getCMap p2))
 
 setMarks :: Player -> Player -> [(Int, Mark)] -> Player
-setMarks p p2 darts = setCard p $ setMap pc1 $ getMap $ foldr step pc1 darts
-    where (pc1,pc2) = (card p, getMap (card p2))
-          step (n,m) ys = let (Just p2cur) = M.lookup n pc2
-                              (Just p1cur) = M.lookup n $ getMap ys
+setMarks p p2 darts = setCard p $ foldr step pc1 darts
+    where (pc1,pc2) = (card p, getCMap p2)
+          step (n,m) ys = let p2cur = fromMaybe 0 $ M.lookup n pc2
+                              p1cur = fromMaybe 0 $ M.lookup n $ getMap ys
                           in if ((&&) `on` (== Closed)) p2cur p1cur || n < 15
                              then ys
                              else if p1cur < Closed
                                   then setMap ys $ M.update (const (Just (p1cur + m))) n (getMap ys)
-                                  else setScore ys $ m `multNum` getScore ys
+                                  else setScore ys $ m `multNum` n + getScore ys
+
+getCMap :: Player -> M.Map Int Mark
+getCMap = getMap . card
 
 multNum :: Mark -> (Int -> Int)
 multNum None   = id
