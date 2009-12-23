@@ -37,6 +37,8 @@ instance Show Card where
   show (Card m s) = foldl step "" (M.toList m) ++ "Score: " ++ show s
     where step xs (n,mark) = xs ++ (show n ++ ": ") ++ show mark ++ "\n"
 
+createCard :: Card
+createCard = Card (M.fromList (zip [15..21] (replicate 5 None))) 0
 
 getMap :: Card -> M.Map Int Mark
 getMap (Card m _) = m
@@ -51,7 +53,12 @@ setScore :: Card -> Score -> Card
 setScore (Card m _) = Card m
 
 data Player = Player String Card
-              deriving (Show)
+
+instance Show Player where
+  show (Player s c) = "Name: " ++ s ++ "\n" ++ show c
+
+createPlayer :: String -> Player
+createPlayer = (flip Player) createCard
 
 name :: Player -> String
 name (Player s _) = s
@@ -65,12 +72,10 @@ setCard (Player s _) = Player s
 data ScoreCard = ScoreCard Player Player
 
 instance Show ScoreCard where
-  show (ScoreCard (Player s c) (Player s2 c2)) =
-    intercalate "\n" $  heading : zipWith (++) 
+  show (ScoreCard c c2) =
+    intercalate "\n" $ zipWith (++) 
     (map (\x -> x ++ replicate (20 - length x) ' ') $ lines $ show c)
     (lines $ show c2)
-
-    where heading = s ++ replicate (20 - length s) ' ' ++ s2
     
   
 ------------------------------------------------------
