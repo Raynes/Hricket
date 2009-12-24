@@ -1,4 +1,4 @@
-module Player (Mark(..), Player, createPlayer, mark)  where
+module Player (Mark(..), Player, createPlayer, mark, isGameOver)  where
 
 import qualified Data.Map as M
 import Data.List (intercalate)
@@ -75,24 +75,24 @@ isGameOver p1 p2 = ((&&) `on` (== replicate 7 Three)) play1 play2
     where (play1,play2) = 
               (map snd (M.toList $ getCMap p1),map snd (M.toList $ getCMap p2))
 
-mark :: Player -> Player -> [String]-> Player
-mark p1 p2 darts = setMarks p1 p2 $ dartString darts
+mark :: Player -> Player -> String -> (Player, Bool)
+mark p1 p2 darts = let np = setMarks p1 p2 (dartString darts)
+                   in (np, isGameOver np p2)
 
-dartString :: [String] -> [(Int, Mark)]
-dartString = helper . words . intercalate " "
-    where helper (x:y:xs) = (read x :: Int, read y :: Mark) : helper xs
-          helper []       = []
+dartString :: String -> (Int, Mark)
+dartString s = let (x:y:[]) = words s 
+               in (read x :: Int, read y :: Mark) 
 
-setMarks :: Player -> Player -> [(Int, Mark)] -> Player
-setMarks p p2 darts = setCard p $ foldr step pc1 darts
+setMarks :: Player -> Player -> (Int, Mark) -> Player
+setMarks p p2 (n,m) = setCard p $ let p2cur = fromMaybe 0 $ M.lookup n pc2
+                                      p1cur = fromMaybe 0 $ M.lookup n $ getMap pc1
+                                  in if ((&&) `on` (== Three)) p2cur p1cur || n < 15
+                                     then pc1
+                                     else if p1cur < Three
+                                          then setMap pc1 $ M.update (const (Just (p1cur + m))) n (getMap pc1)
+                                          else setScore pc1 $ m `multNum` n + getScore pc1
     where (pc1,pc2) = (card p, getCMap p2)
-          step (n,m) ys = let p2cur = fromMaybe 0 $ M.lookup n pc2
-                              p1cur = fromMaybe 0 $ M.lookup n $ getMap ys
-                          in if ((&&) `on` (== Three)) p2cur p1cur || n < 15
-                             then ys
-                             else if p1cur < Three
-                                  then setMap ys $ M.update (const (Just (p1cur + m))) n (getMap ys)
-                                  else setScore ys $ m `multNum` n + getScore ys
+
 
 getCMap :: Player -> M.Map Int Mark
 getCMap = getMap . card
