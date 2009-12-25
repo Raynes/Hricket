@@ -1,10 +1,10 @@
-module Player (Mark(..), Player, createPlayer, mark, isGameOver)  where
+module Player (Mark(..), Player, createPlayer, mark, isGameOver, name)  where
 
 import qualified Data.Map as M
 import Data.List (intercalate)
 import Control.Monad (ap)
 import Data.Function (on)
-import Data.Maybe
+import Data.Maybe (fromMaybe)
 
 type Score = Int
 
@@ -55,7 +55,7 @@ instance Show Player where
   show (Player s c) = "Name: " ++ s ++ "\n" ++ show c
 
 createPlayer :: String -> Player
-createPlayer = (flip Player) createCard
+createPlayer = flip Player createCard
 
 name :: Player -> String
 name (Player s _) = s
@@ -71,13 +71,12 @@ setCard (Player s _) = Player s
 ------------------------------------------------------
 
 isGameOver :: Player -> Player -> Bool
-isGameOver p1 p2 = ((&&) `on` (== replicate 7 Three)) play1 play2
+isGameOver p1 p2 = ((||) `on` (== replicate 7 Three)) play1 play2
     where (play1,play2) = 
               (map snd (M.toList $ getCMap p1),map snd (M.toList $ getCMap p2))
 
-mark :: Player -> Player -> String -> (Player, Bool)
-mark p1 p2 darts = let np = setMarks p1 p2 (dartString darts)
-                   in (np, isGameOver np p2)
+mark :: Player -> Player -> String -> Player
+mark p1 p2 = setMarks p1 p2 . dartString
 
 dartString :: String -> (Int, Mark)
 dartString s = let (x:y:[]) = words s 

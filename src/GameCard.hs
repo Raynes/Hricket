@@ -17,7 +17,7 @@ setPlayer n gcard p = case n of
                         2 -> setPlayer2 gcard p
 
 setPlayer1 :: GameCard -> Player -> GameCard
-setPlayer1 (GameCard _ p2) = (flip GameCard) p2
+setPlayer1 (GameCard _ p2) = flip GameCard p2
 
 setPlayer2 :: GameCard -> Player -> GameCard
 setPlayer2 (GameCard p1 _) = GameCard p1
