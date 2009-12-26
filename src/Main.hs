@@ -2,6 +2,7 @@ module Main where
 
 import GameCard
 import Player
+import Game
 import System.IO
 import Data.IORef (newIORef, readIORef, writeIORef, IORef)
 
