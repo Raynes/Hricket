@@ -25,3 +25,4 @@ getScore (Card _ s) = s
 
 setScore :: Card -> Score -> Card
 setScore (Card m _) = Card m
+
