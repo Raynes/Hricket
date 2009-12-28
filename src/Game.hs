@@ -15,11 +15,11 @@ isGameOver p1 p2 = ((||) `on` (== replicate 7 Three)) play1 play2
               (map snd (M.toList $ getCMap p1),map snd (M.toList $ getCMap p2))
 
 mark :: Player -> Player -> String -> Player
-mark p1 p2 = setMarks p1 p2 . dartString
+mark p1 p2 = setMarks p1 p2 . dartString . words
 
-dartString :: String -> (Int, Mark)
-dartString s = let (x:y:[]) = words s 
-               in (read x :: Int, read y :: Mark) 
+dartString :: [String] -> (Int, Mark)
+dartString (x:y:[]) = (read x :: Int, read y :: Mark) 
+dartString (x:[])   = (0,None)
 
 setMarks :: Player -> Player -> (Int, Mark) -> Player
 setMarks p p2 (n,m) = setCard p $ let p2cur = fromMaybe 0 $ M.lookup n pc2
