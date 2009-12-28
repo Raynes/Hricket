@@ -55,7 +55,7 @@ dartPrompt gst = do
   print gstate
   putStrLn "\nEnter the dart you hit, a single space, and the number of markings.\
             \\nFor example: 15 3 ,15 2, 15 1 or 0 for nothing.\n"
-  ds <- getLine
+  ds <- getValidInput
   let marked = mark (getPlayer pn gstate) (getPlayer 2 gstate) ds
   writeIORef gst gsraw {gamecard = (setPlayer pn gstate marked)
                        ,cplayer = (if ctime gsraw == 0 then increment pn else pn)}
