@@ -3,6 +3,7 @@ module Main where
 import GameCard
 import Player
 import Game
+import Card
 import System.IO
 import Data.Char (isDigit, isSpace)
 import Data.IORef (newIORef, readIORef, writeIORef, IORef)
@@ -27,8 +28,11 @@ mainLoop dp = do
   if isGameOver (getPlayer 1 (gamecard gstate)) (getPlayer 2 (gamecard gstate))
    then do 
      print (gamecard gstate)
-     ref <- readIORef res 
-     putStrLn $ (++ " wins!") $ show $ name (getPlayer (cplayer ref) (gamecard ref))
+     ref <- readIORef res
+     let p1 = getScore (card (getPlayer (cplayer ref) (gamecard ref)))
+         p2 = getScore (card (getPlayer (increment (cplayer ref)) (gamecard ref)))
+         winner = if p1 > p2 then cplayer ref else increment (cplayer ref)
+     putStrLn $ (++ " wins!") $ show $ name (getPlayer winner (gamecard ref))
     else mainLoop $ dartPrompt res
 
 main :: IO ()
