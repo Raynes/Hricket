@@ -7,9 +7,9 @@ data GameCard = GameCard Player Player
 
 instance Show GameCard where
   show (GameCard c c2) =
-    intercalate "\n" $ zipWith (++) 
+    "\n" ++ (intercalate "\n" $ zipWith (++) 
     (map (\x -> x ++ replicate (20 - length x) ' ') $ lines $ show c)
-    (lines $ show c2)
+    (lines $ show c2))
 
 setPlayer :: Int -> GameCard -> Player -> GameCard
 setPlayer n gcard p = case n of
