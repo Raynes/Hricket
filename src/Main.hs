@@ -4,8 +4,9 @@ import GameCard
 import Player
 import Game
 import System.IO
-import Data.Char (digitToInt, isSpace)
+import Data.Char (isDigit, isSpace)
 import Data.IORef (newIORef, readIORef, writeIORef, IORef)
+import Control.Monad (liftM2)
 
 data GState = GState {gamecard :: GameCard, cplayer :: Int
                      ,ctime :: Int}
@@ -60,16 +61,20 @@ dartPrompt gst = do
                        ,cplayer = (if ctime gsraw == 0 then increment pn else pn)}
   return gst
 
-getValidInput :: Int -> IO String
-getValidInput n = helper n ""
+getValidInput :: IO String
+getValidInput = helper 0 ""
     where helper 1 s = return s
           helper 0 s = do
             x <- getLine
-            if any isSpace x
-             then let (sub, end) = break isSpace x
-                  in if read sub > 21 || read end > 3
-                     then putStrLn "Invalid input. Please try again." >> helper 0 s
-                     else helper 1 x
-             else if read x == 0 
-                  then helper 1 x
-                  else putStrLn "Invalid input. Please try again." >> helper 0 s
+            if not $ noLetters x 
+             then putStrLn "Invalid input. Please try again." >> helper 0 s
+             else if any isSpace x
+                  then let (sub, end) = break isSpace x
+                       in if let {x = read sub; l = read end } 
+                             in x > 21 || x < 1 || l > 3 || l < 1
+                          then putStrLn "Invalid input. Please try again." >> helper 0 s
+                          else helper 1 x
+                  else if read x == 0 
+                       then helper 1 x
+                       else putStrLn "Invalid input. Please try again." >> helper 0 s
+          noLetters y = all (liftM2 (||) isDigit isSpace) y
