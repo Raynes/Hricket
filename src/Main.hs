@@ -60,7 +60,7 @@ dartPrompt gst = do
   putStrLn "\nEnter the dart you hit, a single space, and the number of markings.\
             \\nFor example: 15 3 ,15 2, 15 1 or 0 for nothing.\n"
   ds <- getValidInput
-  let marked = mark (getPlayer pn gstate) (getPlayer 2 gstate) ds
+  let marked = mark (getPlayer pn gstate) (getPlayer (increment pn) gstate) ds
   writeIORef gst gsraw {gamecard = (setPlayer pn gstate marked)
                        ,cplayer = (if ctime gsraw == 0 then increment pn else pn)}
   return gst
@@ -75,7 +75,7 @@ getValidInput = helper 0 ""
              else if any isSpace x
                   then let (sub, end) = break isSpace x
                        in if let {x = read sub; l = read end } 
-                             in x > 21 || x < 1 || l > 3 || l < 1
+                             in x > 20 && x < 25 || x < 1 || l > 3 || l < 1
                           then putStrLn "Invalid input. Please try again." >> helper 0 s
                           else helper 1 x
                   else if read x == 0 

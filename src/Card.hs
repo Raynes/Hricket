@@ -12,7 +12,7 @@ instance Show Card where
     where step xs (n,mark) = xs ++ (show n ++ ": ") ++ show mark ++ "\n"
 
 createCard :: Card
-createCard = Card (M.fromList (zip [15..21] (replicate 7 None))) 0
+createCard = Card (M.fromList (zip ([15..20] ++ [25]) (replicate 7 None))) 0
 
 getMap :: Card -> M.Map Int Mark
 getMap (Card m _) = m
