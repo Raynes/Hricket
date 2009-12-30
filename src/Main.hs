@@ -50,7 +50,6 @@ prompt = do
   putStr "\n"
   newIORef $ newGame p1 p2
 
-
 dartPrompt gst = do
   gsraw' <- readIORef gst
   let gsraw = gsraw' {ctime = (incrementT (ctime gsraw'))}
@@ -68,17 +67,22 @@ dartPrompt gst = do
 getValidInput :: IO String
 getValidInput = helper 0 ""
     where helper 1 s = return s
-          helper 0 s = do
+          helper 0 s = do 
             x <- getLine
-            if not $ noLetters x 
-             then putStrLn "Invalid input. Please try again." >> helper 0 s
-             else if any isSpace x
-                  then let (sub, end) = break isSpace x
-                       in if let {x = read sub; l = read end } 
-                             in x > 20 && x < 25 || x < 1 || l > 3 || l < 1
-                          then putStrLn "Invalid input. Please try again." >> helper 0 s
-                          else helper 1 x
-                  else if read x == 0 
-                       then helper 1 x
-                       else putStrLn "Invalid input. Please try again." >> helper 0 s
-          noLetters y = all (liftM2 (||) isDigit isSpace) y
+            case checkInput x of
+              Right y -> helper 1 y
+              Left  y -> putStrLn y >> helper 0 ""
+
+checkInput :: String -> Either String String
+checkInput x = if not $ noLetters x 
+               then Left "Invalid input. Please try again."
+               else if any isSpace x
+                    then let (sub, end) = break isSpace x
+                         in if let {x = read sub; l = read end } 
+                               in x > 20 && x < 25 || x < 1 || l > 3 || l < 1
+                            then Left "Invalid input. Please try again."
+                            else Right x
+                    else if read x == 0 
+                         then Right x
+                         else Left "Invalid input. Please try again."
+    where noLetters y = all (liftM2 (||) isDigit isSpace) y
