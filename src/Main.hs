@@ -53,8 +53,8 @@ prompt = do
 dartPrompt gst = do
   gsraw' <- readIORef gst
   let gsraw = gsraw' {ctime = (incrementT (ctime gsraw'))}
-  let gstate = gamecard gsraw
-  let pn = cplayer gsraw
+      gstate = gamecard gsraw
+      pn = cplayer gsraw
   print gstate
   putStrLn "\nEnter the dart you hit, a single space, and the number of markings.\
             \\nFor example: 15 3 ,15 2, 15 1 or 0 for nothing.\n"
@@ -77,9 +77,8 @@ checkInput :: String -> Either String String
 checkInput x = if not $ noLetters x 
                then Left "Invalid input. Please try again."
                else if any isSpace x
-                    then let (sub, end) = break isSpace x
-                         in if let {x = read sub; l = read end } 
-                               in x > 20 && x < 25 || x < 1 || l > 3 || l < 1
+                    then let { (sub, end) = break isSpace x; y = read sub; l = read end }
+                         in if y > 20 && y < 25 || y < 1 || l > 3 || l < 1
                             then Left "Invalid input. Please try again."
                             else Right x
                     else if read x == 0 
