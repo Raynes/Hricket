@@ -73,15 +73,16 @@ getValidInput = helper 0 ""
               Right y -> helper 1 y
               Left  y -> putStrLn y >> helper 0 ""
 
-checkInput :: String -> Either String String
-checkInput x = if not $ noLetters x 
-               then Left "Invalid input. Please try again."
-               else if any isSpace x
-                    then let { (sub, end) = break isSpace x; y = read sub; l = read end }
-                         in if y > 20 && y < 25 || y < 1 || l > 3 || l < 1
-                            then Left "Invalid input. Please try again."
-                            else Right x
-                    else if read x == 0 
-                         then Right x
-                         else Left "Invalid input. Please try again."
-    where noLetters y = all (liftM2 (||) isDigit isSpace) y
+checkInput x
+  | not $ noLetters x = Left "Invalid input. Please try again."
+  | any isSpace x =
+    let (sub, end) = break isSpace x
+        y = read sub
+        l = read end
+    in
+      if y > 20 && y < 25 || y < 1 || l > 3 || l < 1 
+      then Left "Invalid input. Please try again." 
+      else Right x
+  | read x == 0 = Right x
+  | otherwise = Left "Invalid input. Please try again."
+  where noLetters = all (liftM2 (||) isDigit isSpace)

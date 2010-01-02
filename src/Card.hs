@@ -1,4 +1,9 @@
-module Card where
+module Card (Card
+            ,createCard 
+            ,getMap
+            ,setMap
+            ,getScore
+            ,setScore) where
 
 import Mark
 import qualified Data.Map as M

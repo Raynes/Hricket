@@ -1,6 +1,4 @@
-module Game (isGameOver
-            ,mark
-            ,dartString) where
+module Game (isGameOver, mark) where
 
 import qualified Data.Map as M
 import Data.Function (on)

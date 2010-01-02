@@ -23,6 +23,6 @@ instance Read Mark where
         tryParse [("0", None),("1", One), ("2", Two), ("3", Three)]
         where tryParse [] = []
               tryParse ((attempt, result):xs) =
-                      if (take (length attempt) value) == attempt
+                      if take (length attempt) value == attempt
                          then [(result, drop (length attempt) value)]
                          else tryParse xs
