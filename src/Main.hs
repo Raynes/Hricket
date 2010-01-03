@@ -55,34 +55,38 @@ dartPrompt gst = do
   let gsraw = gsraw' {ctime = (incrementT (ctime gsraw'))}
       gstate = gamecard gsraw
       pn = cplayer gsraw
+      play = getPlayer pn gstate
   print gstate
-  putStrLn "\nEnter the dart you hit, a single space, and the number of markings.\
-            \\nFor example: 15 3 ,15 2, 15 1 or 0 for nothing.\n"
-  ds <- getValidInput
+  putStr $ "\nEnter the dart you hit, a single space, and the number of markings.\
+           \\nFor example: 15 3 ,15 2, 15 1 or 0 for nothing.\n" ++ name play ++
+           ": "
+  hFlush stdout
+  ds <- getValidInput play
   let marked = mark (getPlayer pn gstate) (getPlayer (increment pn) gstate) ds
   writeIORef gst gsraw {gamecard = (setPlayer pn gstate marked)
                        ,cplayer = (if ctime gsraw == 0 then increment pn else pn)}
   return gst
 
-getValidInput :: IO String
-getValidInput = helper 0 ""
+getValidInput :: Player -> IO String
+getValidInput player = helper 0 ""
     where helper 1 s = return s
-          helper 0 s = do 
+          helper 0 s = do
             x <- getLine
-            case checkInput x of
+            case checkInput x player of
               Right y -> helper 1 y
-              Left  y -> putStrLn y >> helper 0 ""
+              Left  y -> putStr y >> hFlush stdout >> helper 0 ""
 
-checkInput x
-  | not $ noLetters x = Left "Invalid input. Please try again."
-  | any isSpace x =
+checkInput x player
+  | not $ noLetters x = Left str
+  | any isSpace x && not (isSpace (last x)) =
     let (sub, end) = break isSpace x
         y = read sub
         l = read end
     in
       if y > 20 && y < 25 || y < 1 || l > 3 || l < 1 
-      then Left "Invalid input. Please try again." 
+      then Left str
       else Right x
   | read x == 0 = Right x
-  | otherwise = Left "Invalid input. Please try again."
+  | otherwise = Left str
   where noLetters = all (liftM2 (||) isDigit isSpace)
+        str = "Invalid input. Please try again.\n" ++ name player ++ ": " 
