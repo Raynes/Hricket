@@ -10,18 +10,12 @@ The recommended way to use this application, is to begin by opening it up and en
 then want player 1 to throw 3 darts. Enter each dart into the application one at a time. You'll type the number you hit 
 on the board, a single space, and the number of markings. For instance, if you hit the number 16 in the treble, you 
 would enter '16 3'. If you hit 20 in the single you would enter '20 1'. For numbers lower than 15, which are not used in 
-standard Cricket games, enter 0. When all numbers are opened/closed by one of the players, that player's score will be ran against the 
+standard Cricket games, enter 0. If didn't hit any relevant numbers, you can type 'skip' to skip the rest of your turn. You can also do this even if you got one relevant number. When all numbers are opened/closed by one of the players, that player's score will be ran against the 
 other players score, and if it's higher, that player will be declared the winner. Otherwise, the other player wins.
 
 You are expected to know how to play Cricket before using this application. This is not a Cricket tutorial, and the 
 application will not teach you to play Cricket.
 
-In the next version: 
-
-Turn prompts to show you whos turn it is at any given time so you don't have to keep track of it in your head.
-
-A way to end your turn, so if every dart is nothing useful, you don't have to enter 0 every time. This would also be useful in case you only throw a single good dart, that way you could just enter that dart, and then end the turn.
-
-
+I might wrap a simple GUI around this application in the future.
 
 I made this application our of necessity and boredom. Enjoy.
