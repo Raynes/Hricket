@@ -62,10 +62,12 @@ dartPrompt gst = do
            ": "
   hFlush stdout
   ds <- getValidInput play
-  let marked = mark (getPlayer pn gstate) (getPlayer (increment pn) gstate) ds
-  writeIORef gst gsraw {gamecard = (setPlayer pn gstate marked)
-                       ,cplayer = (if ctime gsraw == 0 then increment pn else pn)}
-  return gst
+  if ds /= "skip"
+   then do let marked = mark (getPlayer pn gstate) (getPlayer (increment pn) gstate) ds
+           writeIORef gst gsraw {gamecard = (setPlayer pn gstate marked)
+                                ,cplayer = (if ctime gsraw == 0 then increment pn else pn)}
+           return gst
+   else writeIORef gst gsraw {cplayer = (increment pn), ctime = 0} >> return gst
 
 getValidInput :: Player -> IO String
 getValidInput player = helper 0 ""
@@ -77,16 +79,17 @@ getValidInput player = helper 0 ""
               Left  y -> putStr y >> hFlush stdout >> helper 0 ""
 
 checkInput x player
-  | not $ noLetters x = Left str
-  | any isSpace x && not (isSpace (last x)) =
-    let (sub, end) = break isSpace x
-        y = read sub
-        l = read end
-    in
-      if y > 20 && y < 25 || y < 1 || l > 3 || l < 1 
-      then Left str
-      else Right x
-  | read x == 0 = Right x
-  | otherwise = Left str
-  where noLetters = all (liftM2 (||) isDigit isSpace)
-        str = "Invalid input. Please try again.\n" ++ name player ++ ": " 
+    | x == "skip" = Right "skip"
+    | not $ noLetters x = Left str
+    | any isSpace x && not (isSpace (last x)) =
+        let (sub, end) = break isSpace x
+            y = read sub
+            l = read end
+        in
+          if y > 20 && y < 25 || y < 1 || l > 3 || l < 1 
+          then Left str
+          else Right x
+    | read x == 0 = Right x
+    | otherwise = Left str
+    where noLetters = all (liftM2 (||) isDigit isSpace)
+          str = "Invalid input. Please try again.\n" ++ name player ++ ": " 
