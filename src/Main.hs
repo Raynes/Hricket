@@ -79,7 +79,7 @@ getValidInput player = helper 0 ""
               Left  y -> putStr y >> hFlush stdout >> helper 0 ""
 
 checkInput x player
-    | x == "skip" = Right "skip"
+    | x == "skip" || x == "s" = Right "skip"
     | not $ noLetters x = Left str
     | any isSpace x && not (isSpace (last x)) =
         let (sub, end) = break isSpace x
